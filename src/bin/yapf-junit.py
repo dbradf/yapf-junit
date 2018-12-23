@@ -98,7 +98,8 @@ def find_files(root_dir, extension):
 @click.command()
 @click.option('--dir', required=True, help='Directory to search.')
 @click.option('--out-file', required=True, help='File to write results to.')
-def yapf_junit(dir, out_file):
+@click.option('--yapf-config', help='Yapf config file to use.')
+def yapf_junit(dir, out_file, yapf_config):
     files_to_run = find_files(dir, '.py')
 
     results = []
@@ -108,7 +109,7 @@ def yapf_junit(dir, out_file):
         is_fail = False
         start_time = datetime.datetime.now()
         try:
-            diff, encoding, needs_change = FormatFile(f, print_diff=True)
+            diff, encoding, needs_change = FormatFile(f, print_diff=True, style_config=yapf_config)
             if needs_change:
                 failure_count += 1
         except ParseError as err:
