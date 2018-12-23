@@ -20,8 +20,8 @@ def create_xml_results(failed_tests, err_count, results):
     :return: junit xml results.
     """
     root = ET.Element('testsuites')
-    test_suite = ET.SubElement(root, 'testsuite', errors=err_count,
-                               failures=failed_tests, name='yapf', tests=len(results))
+    test_suite = ET.SubElement(root, 'testsuite', errors=str(err_count),
+                               failures=str(failed_tests), name='yapf', tests=str(len(results)))
     for result in results:
         result.to_xml(test_suite)
 
@@ -66,7 +66,7 @@ class YapfResult:
         """
         Convert yapf result to junit xml.
         """
-        test = ET.SubElement(parent, 'testcase', classname=self.suite(), name=self.name(), time=self._runtime)
+        test = ET.SubElement(parent, 'testcase', classname=self.suite(), name=self.name(), time=str(self._runtime))
         ET.SubElement(test, 'system-err').text = self._diff
 
 
