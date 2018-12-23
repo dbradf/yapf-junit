@@ -70,9 +70,9 @@ class YapfResult:
         test = ET.SubElement(parent, 'testcase', classname=self.suite(), name=self.name(), time=str(self._runtime))
         if self._needs_change:
             if self._is_failure:
-                ET.SubElement(test, 'failure').text = self._diff
+                ET.SubElement(test, 'error', type='Could not run yapf').text = self._diff
             else:
-                ET.SubElement(test, 'error').text = self._diff
+                ET.SubElement(test, 'failure', type='yapf failure').text = self._diff
 
 
 def find_files(root_dir, extension):
