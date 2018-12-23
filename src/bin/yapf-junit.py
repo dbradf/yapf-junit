@@ -3,6 +3,7 @@
 import datetime
 import os
 import sys
+import xml.etree.ElementTree as ET
 
 import click
 from yapf.yapflib.yapf_api import FormatFile
@@ -18,14 +19,21 @@ def create_xml_results(failed_tests, err_count, results):
     :param results: List of test results.
     :return: junit xml results.
     """
-    test_case_output = '\n'.join([r.to_xml() for r in results])
+    root = ET.Element('testsuites')
+    test_suite = ET.SubElement(root, 'testsuite', errors=err_count,
+                               failures=failed_tests, name='yapf', tests=len(results))
+    for result in results:
+        result.to_xml(test_suite)
 
-    return f"""<?xml version="1.0" ?>
-    <testsuites>
-        <testsuite errors="{err_count}" failures="{failed_tests}" name="yapf" tests="{len(results)}">
-            {test_case_output}
-        </testsuite>
-    </testsuites>"""
+    tree = ET.ElementTree(root)
+    return tree
+
+    # return f"""<?xml version="1.0" ?>
+    # <testsuites>
+    #     <testsuite errors="{err_count}" failures="{failed_tests}" name="yapf" tests="{len(results)}">
+    #         {test_case_output}
+    #     </testsuite>
+    # </testsuites>""testsuites"
 
 
 class YapfResult:
@@ -54,17 +62,12 @@ class YapfResult:
         """Name of test (filename)."""
         return os.path.basename(self._filename)
 
-    def to_xml(self):
+    def to_xml(self, parent):
         """
         Convert yapf result to junit xml.
-
-        :return: junit xml string.
         """
-        return f"""<testcase classname="{self.suite()}" name="{self.name()}" time="{self._runtime}">
-            <system-err>
-            {self._diff}
-            </system-err>
-        </testcase>"""
+        test = ET.SubElement(parent, 'testcase', classname=self.suite(), name=self.name(), time=self._runtime)
+        ET.SubElement(test, 'system-err').text = self._diff
 
 
 def find_files(root_dir, extension):
@@ -111,9 +114,10 @@ def yapf_junit(dir, out_file):
         results.append(YapfResult(f, diff, needs_change, end_time - start_time))
 
     xml_data = create_xml_results(failure_count, err_count, results)
+    xml_data.write(out_file)
 
-    with open(out_file, 'w') as fp:
-        fp.write(xml_data)
+    # with open(out_file, 'w') as fp:
+    #     fp.write(xml_data)
 
     if failure_count > 0:
         sys.exit(1)
