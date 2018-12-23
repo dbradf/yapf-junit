@@ -67,7 +67,7 @@ class YapfResult:
         Convert yapf result to junit xml.
         """
         test = ET.SubElement(parent, 'testcase', classname=self.suite(), name=self.name(), time=str(self._runtime))
-        ET.SubElement(test, 'system-err').text = self._diff
+        ET.SubElement(test, 'error').text = self._diff
 
 
 def find_files(root_dir, extension):
