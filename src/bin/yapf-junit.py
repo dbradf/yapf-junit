@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 
 import click
 from yapf.yapflib.yapf_api import FormatFile
@@ -86,7 +87,7 @@ def find_files(root_dir, extension):
 @click.option('--dir', required=True, help='Directory to search.')
 @click.option('--out-file', required=True, help='File to write results to.')
 def yapf_junit(dir, out_file):
-    files_to_run = ff.find_files(dir, '.py')
+    files_to_run = find_files(dir, '.py')
 
     results = []
     failure_count = 0
@@ -102,6 +103,9 @@ def yapf_junit(dir, out_file):
 
     with open(out_file, 'w') as fp:
         fp.write(xml_data)
+
+    if failure_count > 0:
+        sys.exit(1)
 
 
 if __name__ == '__main__':
