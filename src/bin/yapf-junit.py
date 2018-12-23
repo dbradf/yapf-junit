@@ -6,13 +6,15 @@ import sys
 
 import click
 from yapf.yapflib.yapf_api import FormatFile
+from lib2to3.pgen2.parse import ParseError
 
 
-def create_xml_results(failed_tests, results):
+def create_xml_results(failed_tests, err_count, results):
     """
     Create junit xml for the test results.
 
     :param failed_tests: Number of tests that failed.
+    :param err_count: Number of tests that hit errors.
     :param results: List of test results.
     :return: junit xml results.
     """
@@ -20,7 +22,7 @@ def create_xml_results(failed_tests, results):
 
     return f"""<?xml version="1.0" ?>
     <testsuites>
-        <testsuite errors="0" failures="{failed_tests}" name="yapf" tests="{len(results)}">
+        <testsuite errors="{err_count}" failures="{failed_tests}" name="yapf" tests="{len(results)}">
             {test_case_output}
         </testsuite>
     </testsuites>"""
@@ -93,15 +95,22 @@ def yapf_junit(dir, out_file):
 
     results = []
     failure_count = 0
+    err_count = 0
     for f in files_to_run:
         start_time = datetime.datetime.now()
-        diff, encoding, needs_change = FormatFile(f, print_diff=True)
+        try:
+            diff, encoding, needs_change = FormatFile(f, print_diff=True)
+            if needs_change:
+                failure_count += 1
+        except ParseError as err:
+            diff = str(err)
+            needs_change = True
+            err_count += 1
+
         end_time = datetime.datetime.now()
-        if needs_change:
-            failure_count += 1
         results.append(YapfResult(f, diff, needs_change, end_time - start_time))
 
-    xml_data = create_xml_results(failure_count, results)
+    xml_data = create_xml_results(failure_count, err_count, results)
 
     with open(out_file, 'w') as fp:
         fp.write(xml_data)
