@@ -40,7 +40,7 @@ class YapfResult:
     """
     Results of a yapf run.
     """
-    def __init__(self, filename, diff, needs_change, runtime):
+    def __init__(self, filename, diff, needs_change, runtime, is_failure=False):
         """
         Create a YapfResult.
 
@@ -53,6 +53,7 @@ class YapfResult:
         self._diff = diff
         self._needs_change = needs_change
         self._runtime = runtime.total_seconds()
+        self._is_failure = is_failure
 
     def suite(self):
         """Name of suite (directory analyzed)."""
@@ -67,7 +68,11 @@ class YapfResult:
         Convert yapf result to junit xml.
         """
         test = ET.SubElement(parent, 'testcase', classname=self.suite(), name=self.name(), time=str(self._runtime))
-        ET.SubElement(test, 'error').text = self._diff
+        if self._needs_change:
+            if self._is_failure:
+                ET.SubElement(test, 'failure').text = self._diff
+            else:
+                ET.SubElement(test, 'error').text = self._diff
 
 
 def find_files(root_dir, extension):
@@ -100,18 +105,20 @@ def yapf_junit(dir, out_file):
     failure_count = 0
     err_count = 0
     for f in files_to_run:
+        is_fail = False
         start_time = datetime.datetime.now()
         try:
             diff, encoding, needs_change = FormatFile(f, print_diff=True)
             if needs_change:
                 failure_count += 1
         except ParseError as err:
+            is_fail = True
             diff = str(err)
             needs_change = True
             err_count += 1
 
         end_time = datetime.datetime.now()
-        results.append(YapfResult(f, diff, needs_change, end_time - start_time))
+        results.append(YapfResult(f, diff, needs_change, end_time - start_time, is_fail))
 
     xml_data = create_xml_results(failure_count, err_count, results)
     xml_data.write(out_file)
