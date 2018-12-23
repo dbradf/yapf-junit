@@ -4,8 +4,6 @@ import os
 import click
 from yapf.yapflib.yapf_api import FormatFile
 
-import yapfjunit.find_files as ff
-
 
 def create_xml_results(failed_tests, results):
     """
