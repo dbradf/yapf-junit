@@ -3,7 +3,6 @@
 import datetime
 import os
 import sys
-import xml.etree.ElementTree as ET
 
 import click
 from yapf.yapflib.yapf_api import FormatFile
