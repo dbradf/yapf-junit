@@ -34,9 +34,13 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(path))[0] for path in glob("src/*.py")],
-    scripts=['src/bin/yapf-junit.py'],
     install_requires=[
         'click',
         'yapf',
     ],
+    entry_points={
+        'console_scripts': [
+            'yapf-junit = yapfjunit.cli:yapf_junit',
+        ]
+    }
 )
