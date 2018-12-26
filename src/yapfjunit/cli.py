@@ -46,8 +46,8 @@ def run_yapf(target_file, failure_count, error_count, yapf_config):
     """
     start_time = datetime.datetime.now()
     try:
-        diff, encoding, needs_change = FormatFile(target_file, print_diff=True,
-                                                  style_config=yapf_config)
+        diff, encoding, needs_change = FormatFile(
+            target_file, print_diff=True, style_config=yapf_config)
         if needs_change:
             end_time = datetime.datetime.now()
             failure_count += 1
@@ -70,8 +70,10 @@ def yapf_junit(target_dir, out_file, yapf_config):
 
     failure_count = 0
     err_count = 0
-    results = [run_yapf(target_file, failure_count, err_count, yapf_config)
-               for target_file in files_to_run]
+    results = [
+        run_yapf(target_file, failure_count, err_count, yapf_config)
+        for target_file in files_to_run
+    ]
 
     report = JUnitReport(failure_count, err_count, results)
     report.to_xml().write(out_file)

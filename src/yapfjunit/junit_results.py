@@ -8,6 +8,7 @@ from xml.etree.ElementTree import SubElement
 
 class JUnitReport:
     """Representation of a test run."""
+
     def __init__(self, failure_count, error_count, results):
         """
         Create a JUnitRun object.
@@ -27,9 +28,13 @@ class JUnitReport:
         :return: xml object of results.
         """
         root = Element('testsuites')
-        test_suite = SubElement(root, 'testsuite', errors=str(self._error_count),
-                                failures=str(self._failure_count), name='yapf',
-                                tests=str(len(self._results)))
+        test_suite = SubElement(
+            root,
+            'testsuite',
+            errors=str(self._error_count),
+            failures=str(self._failure_count),
+            name='yapf',
+            tests=str(len(self._results)))
 
         for result in self._results:
             result.to_xml(test_suite)
@@ -81,8 +86,12 @@ class JUnitResult:
         :param parent: Parent element.
         :return: element representing this testcase.
         """
-        return SubElement(parent, 'testcase', classname=self.suite(), name=self.name(),
-                          time=str(self.get_formatted_runtime()))
+        return SubElement(
+            parent,
+            'testcase',
+            classname=self.suite(),
+            name=self.name(),
+            time=str(self.get_formatted_runtime()))
 
     def to_xml(self, parent):
         """
@@ -113,7 +122,8 @@ class JUnitError(JUnitResult):
         :param parent: Parent xml element.
         """
         testcase = self._get_testcase_xml(parent)
-        SubElement(testcase, 'error', type='Could not run yapf').text = self._text
+        SubElement(
+            testcase, 'error', type='Could not run yapf').text = self._text
 
 
 class JUnitFailure(JUnitResult):
