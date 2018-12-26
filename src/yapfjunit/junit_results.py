@@ -6,7 +6,7 @@ from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
 
 
-class JUnitReport:
+class JUnitReport(object):
     """Representation of a test run."""
 
     def __init__(self, failure_count, error_count, results):
@@ -42,7 +42,7 @@ class JUnitReport:
         return ElementTree(root)
 
 
-class JUnitResult:
+class JUnitResult(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, filename, runtime):
