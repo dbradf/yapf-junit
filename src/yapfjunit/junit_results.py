@@ -114,7 +114,7 @@ class JUnitError(JUnitResult):
         :param runtime: runtime of test.
         """
         self._text = text
-        super().__init__(filename, runtime)
+        super(JUnitError, self).__init__(filename, runtime)
 
     def to_xml(self, parent):
         """
@@ -138,7 +138,7 @@ class JUnitFailure(JUnitResult):
         :param runtime: runtime of test.
         """
         self._text = text
-        super().__init__(filename, runtime)
+        super(JUnitFailure, self).__init__(filename, runtime)
 
     def to_xml(self, parent):
         """
