@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="yapf-junit",
-    version="0.1.0",
+    version="0.25.0",
     description="Run yapf and report results in junit compatible xml",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -36,7 +36,7 @@ setup(
     py_modules=[splitext(basename(path))[0] for path in glob("src/*.py")],
     install_requires=[
         'click',
-        'yapf',
+        'yapf==0.25.0',
     ],
     entry_points={
         'console_scripts': [
